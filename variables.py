@@ -16,8 +16,6 @@ icono = pg.image.load("pong.png")
 #Titulo de la ventana
 titulo = "PONG"
 
-
-
 #COLORES
 #Definimos los colores que vamos a usar en el juego
 BLANCO = (255,255,255)
@@ -45,3 +43,6 @@ ALTO_PELOTA = 10
 jugador1 = pg.Rect(jugador1_x, jugador1_y, ANCHO_JUGADOR, ALTO_JUGADOR)
 jugador2 = pg.Rect(jugador2_x, jugador2_y, ANCHO_JUGADOR, ALTO_JUGADOR)
 pelota = pg.Rect(pelota_x, pelota_y, ANCHO_PELOTA, ALTO_PELOTA)
+
+#Estado de las teclas
+teclas = pg.key.get_pressed()

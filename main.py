@@ -43,7 +43,27 @@ while v.game:
         #Si el evento es de tipo QUIT, cerramos el bucle
         if event.type == pg.QUIT:
             v.game = False
+
+    #Estado de las teclas
+    teclas = pg.key.get_pressed()
+
+    #Comprobamos el estado de las teclas
+    if teclas[pg.K_w]:
+        if v.jugador1.y > 0:  # Evitar que el jugador salga de la pantalla
+            v.jugador1.y -= 5
     
+    if teclas[pg.K_s]:
+        if v.jugador1.y < 600 - v.ALTO_JUGADOR:  # Evitar que el jugador salga de la pantalla, restamos la altura del jugador a la altura de la pantalla porque si no, el jugador se saldria de la pantalla
+            v.jugador1.y += 5
+
+    if teclas[pg.K_UP]:
+        if v.jugador2.y > 0:  # Evitar que el jugador salga de la pantalla
+            v.jugador2.y -= 5
+
+    if teclas[pg.K_DOWN]:
+        if v.jugador2.y < 600 - v.ALTO_JUGADOR:  # Evitar que el jugador salga de la pantalla
+            v.jugador2.y += 5
+
     #Llamamos a la funcion de dibujar para dibujar los elementos del juego
     dibujar()
 
