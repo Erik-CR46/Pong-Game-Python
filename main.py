@@ -1,5 +1,6 @@
 import pygame as pg
 import variables as v
+import funciones as f
 
 #Inicializar pygame
 pg.init()
@@ -11,7 +12,7 @@ pg.init()
 
 #Actualiza toda la pantalla. 
 # Esta función es utilizada para reflejar todos los cambios en la ventana del juego
-#`pygame.display.flip()`
+#`pygame.display.flip()
 
 
 #`pygame.display.update()`
@@ -24,18 +25,6 @@ pg.display.set_caption(v.titulo)
 #Cambiamos el icono de la ventana
 pg.display.set_icon(v.icono)
 
-
-#Creamos una funcion para dibujar los elementos del juego
-def dibujar():
-    #Dibujamos el fondo de la pantalla
-    v.pantalla.fill(v.FONDO)
-
-    #Dibujamos los jugadores y la pelota
-    pg.draw.rect(v.pantalla, v.AZUL, v.jugador1)
-    pg.draw.rect(v.pantalla, v.ROJO, v.jugador2)
-    pg.draw.rect(v.pantalla, v.BLANCO, v.pelota)
-
-
 #Creamos un bucle infinito para mantener la ventana abierta
 while v.game:
     #Manejamos los eventos de la ventana
@@ -44,35 +33,50 @@ while v.game:
         if event.type == pg.QUIT:
             v.game = False
 
-    #Estado de las teclas
-    teclas = pg.key.get_pressed()
+    if v.in_game:
+        #Estado de las teclas
+        teclas = pg.key.get_pressed()
 
-    #Comprobamos el estado de las teclas
-    if teclas[pg.K_w]:
-        if v.jugador1.y > 0:  # Evitar que el jugador salga de la pantalla
-            v.jugador1.y -= 5
-    
-    if teclas[pg.K_s]:
-        if v.jugador1.y < 600 - v.ALTO_JUGADOR:  # Evitar que el jugador salga de la pantalla, restamos la altura del jugador a la altura de la pantalla porque si no, el jugador se saldria de la pantalla
-            v.jugador1.y += 5
+        #Comprobamos el estado de las teclas
+        if teclas[pg.K_w]:
+            if v.jugador1_rect.y > 0:  # Evitar que el jugador salga de la pantalla
+                v.jugador1_rect.y -= 5
+        
+        if teclas[pg.K_s]:
+            if v.jugador1_rect.y < 600 - v.ALTO_JUGADOR:  # Evitar que el jugador salga de la pantalla, restamos la altura del jugador a la altura de la pantalla porque si no, el jugador se saldria de la pantalla
+                v.jugador1_rect.y += 5
 
-    if teclas[pg.K_UP]:
-        if v.jugador2.y > 0:  # Evitar que el jugador salga de la pantalla
-            v.jugador2.y -= 5
+        if teclas[pg.K_UP]:
+            if v.jugador2_rect.y > 0:  # Evitar que el jugador salga de la spantalla
+                v.jugador2_rect.y -= 5
 
-    if teclas[pg.K_DOWN]:
-        if v.jugador2.y < 600 - v.ALTO_JUGADOR:  # Evitar que el jugador salga de la pantalla
-            v.jugador2.y += 5
+        if teclas[pg.K_DOWN]:
+            if v.jugador2_rect.y < 600 - v.ALTO_JUGADOR:  # Evitar que el jugador salga de la pantalla
+                v.jugador2_rect.y += 5
 
-    #Llamamos a la funcion de dibujar para dibujar los elementos del juego
-    dibujar()
+        #Modificamos la posición de la pelota
+        v.pelota_rect.x += v.velociad_pelota_x
+        v.pelota_rect.y += v.velociad_pelota_y
 
-    #Actualizamos la pantalla para reflejar los cambios
-    pg.display.flip()
+        #Hacemos una comprobacion para que la pelota rebote en los bordes de la pantalla de alto
+        if v.pelota_rect.bottom >= 600 or v.pelota_rect.top <= 0: #Si la posición de la pelota es igual a 600 o 0, significa que ha llegado al borde de la pantalla
+            v.velociad_pelota_y *= -1
+            v.sonido_golpe_pared.play()  # Reproducimos el sonido del golpe
+        
+        f.colision()  # Llamamos a la función de colisión para comprobar si la pelota colisiona con los jugadores
+        f.fuera_juego()  # Llamamos a la función de fuera de juego para comprobar si la pelota sale de la pantalla por los lados
 
-    v.reloj.tick(60)  # Limitamos a 60 FPS
+        #Llamamos a la funcion de dibujar para dibujar los elementos del juego
+        f.dibujar()
 
-    
+        f.ganador()  # Llamamos a la función de ganador para comprobar si algún jugador ha ganado
+
+        #Actualizamos la pantalla para reflejar los cambios
+        pg.display.flip()
+
+        v.reloj.tick(60)  # Limitamos a 60 FPS
+
+        
 
 #Al salir del bucle, cerramos pygame y salimos del programa
 pg.quit()
