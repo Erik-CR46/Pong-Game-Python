@@ -1,4 +1,5 @@
 import pygame as pg
+import random
 import variables as v
 import funciones as f
 
@@ -28,7 +29,8 @@ pg.display.set_icon(v.icono)
 #Creamos un bucle infinito para mantener la ventana abierta
 while v.game:
     #Manejamos los eventos de la ventana
-    for event in pg.event.get():
+    eventos = pg.event.get()
+    for event in eventos:
         #Si el evento es de tipo QUIT, cerramos el bucle
         if event.type == pg.QUIT:
             v.game = False
@@ -46,13 +48,24 @@ while v.game:
             if v.jugador1_rect.y < 600 - v.ALTO_JUGADOR:  # Evitar que el jugador salga de la pantalla, restamos la altura del jugador a la altura de la pantalla porque si no, el jugador se saldria de la pantalla
                 v.jugador1_rect.y += 5
 
-        if teclas[pg.K_UP]:
-            if v.jugador2_rect.y > 0:  # Evitar que el jugador salga de la spantalla
-                v.jugador2_rect.y -= 5
+        if v.cpu_mode:
+            if v.velociad_pelota_x > 0:
+                objetivo_cpu = v.pelota_rect.centery + v.cpu_target_offset
+            else:
+                objetivo_cpu = 300
 
-        if teclas[pg.K_DOWN]:
-            if v.jugador2_rect.y < 600 - v.ALTO_JUGADOR:  # Evitar que el jugador salga de la pantalla
-                v.jugador2_rect.y += 5
+            if objetivo_cpu < v.jugador2_rect.centery - v.cpu_reaccion and v.jugador2_rect.y > 0:
+                v.jugador2_rect.y -= v.cpu_vel
+            elif objetivo_cpu > v.jugador2_rect.centery + v.cpu_reaccion and v.jugador2_rect.y < 600 - v.ALTO_JUGADOR:
+                v.jugador2_rect.y += v.cpu_vel
+        else:
+            if teclas[pg.K_UP]:
+                if v.jugador2_rect.y > 0:  # Evitar que el jugador salga de la spantalla
+                    v.jugador2_rect.y -= 5
+
+            if teclas[pg.K_DOWN]:
+                if v.jugador2_rect.y < 600 - v.ALTO_JUGADOR:  # Evitar que el jugador salga de la pantalla
+                    v.jugador2_rect.y += 5
 
         #Modificamos la posición de la pelota
         v.pelota_rect.x += v.velociad_pelota_x
@@ -69,11 +82,19 @@ while v.game:
         #Llamamos a la funcion de dibujar para dibujar los elementos del juego
         f.dibujar()
 
-        f.ganador()  # Llamamos a la función de ganador para comprobar si algún jugador ha ganado
-
+        f.ganador()
+        
         #Actualizamos la pantalla para reflejar los cambios
         pg.display.flip()
 
+        v.reloj.tick(60)  # Limitamos a 60 FPS
+    else:
+        if v.menu_mode == "main":
+            f.menuInicial(eventos)
+        elif v.menu_mode == "input":
+            f.menuSeleccion(eventos)
+        elif v.menu_mode == "end":
+            f.menuFinal(eventos)
         v.reloj.tick(60)  # Limitamos a 60 FPS
 
         

@@ -1,3 +1,6 @@
+import sys
+import random
+
 import pygame as pg
 import variables as v
 
@@ -94,6 +97,7 @@ def reset_game():
     v.pelota_rect.x = 400  # Reiniciamos la posición de la pelota
     v.pelota_rect.y = 300
     v.velociad_pelota_x *= -1  # Cambiamos la dirección de la pelota
+    v.cpu_target_offset = random.randint(-v.cpu_error, v.cpu_error)
 
 
 
@@ -113,21 +117,159 @@ def fuera_juego():
         v.sonido_punto.play()  # Reproducimos el sonido del punto
 
 
-def reset_all():
+def reset_all(jugador):
     v.pelota_rect.x = 400  # Reiniciamos la posición de la pelota
     v.pelota_rect.y = 300
+    v.jugador1_rect.y = 250
+    v.jugador2_rect.y = 250
     v.in_game = False  # Detenemos el juego
+    v.menu_mode = "end"
+    v.final_message = jugador
+
 
 def ganador():
     #Comprobamos si alguno de los jugadores ha alcanzado el puntaje máximo
     if v.puntaje_jugador1 >= v.puntaje_maximo:
-        print("¡Jugador 1 gana!")
-        reset_all() 
+        reset_all("¡Jugador 1 gana!")
 
     elif v.puntaje_jugador2 >= v.puntaje_maximo:
-        print("¡Jugador 2 gana!")
-        reset_all()
+        reset_all("¡Jugador 2 gana!")
 
-    
+def menuInicial(eventos):
+    v.pantalla.fill(v.NEGRO)  # Limpiamos
 
+    titulo = v.fuente.render("PONG", True, v.BLANCO)
+    icono_escalado = pg.transform.scale(v.icono, (titulo.get_height(), titulo.get_height()))
+    v.pantalla.blit(titulo, titulo.get_rect(center=(400, 120)))
+    v.pantalla.blit(icono_escalado, icono_escalado.get_rect(center=(450, 120)))
+
+    local = pg.Rect(120, 250, 260, 90)
+    cpu = pg.Rect(420, 250, 260, 90)
+    config = pg.Rect(280, 370, 240, 70)
+
+    pg.draw.rect(v.pantalla, v.AZUL, local, border_radius=20)
+    pg.draw.rect(v.pantalla, v.ROJO, cpu, border_radius=20)
+    pg.draw.rect(v.pantalla, v.BLANCO, config, 3, border_radius=20)
+
+    texto_local = v.fuente.render("2 Jugadores", True, v.BLANCO)
+    texto_cpu = v.fuente.render("CPU", True, v.BLANCO)
+    texto_config = v.fuente.render("Puntaje", True, v.BLANCO)
+
+    v.pantalla.blit(texto_local, texto_local.get_rect(center=local.center))
+    v.pantalla.blit(texto_cpu, texto_cpu.get_rect(center=cpu.center))
+    v.pantalla.blit(texto_config, texto_config.get_rect(center=config.center))
+
+    instruccion = v.fuente.render("Esc: Salir", True, v.BLANCO)
+    v.pantalla.blit(instruccion, instruccion.get_rect(center=(400, 520)))
+
+    pg.display.flip()
+
+    for event in eventos:
+        if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+            v.game = False
+        elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
+            if local.collidepoint(event.pos):
+                v.cpu_mode = False
+                v.in_game = True
+            elif cpu.collidepoint(event.pos):
+                v.cpu_mode = True
+                v.in_game = True
+            elif config.collidepoint(event.pos):
+                v.menu_mode = "input"
+
+
+def menuSeleccion(eventos):
+    v.pantalla.fill(v.NEGRO)
+
+    titulo = v.fuente.render("Puntaje máximo", True, v.BLANCO)
+    v.pantalla.blit(titulo, titulo.get_rect(center=(400, 120)))
+
+    pg.draw.rect(v.pantalla, v.BLANCO, v.input_box, 3, border_radius=12)
+    texto = v.fuente_pequena.render(v.input_text, True, v.BLANCO)
+    v.pantalla.blit(texto, (v.input_box.x + 15, v.input_box.y + 15))
+
+    etiqueta = v.fuente.render("Presiona Enter para guardar", True, v.BLANCO)
+    v.pantalla.blit(etiqueta, etiqueta.get_rect(center=(400, 500)))
+
+    if v.input_active:
+        cursor = v.fuente.render("|", True, v.BLANCO)
+        v.pantalla.blit(cursor, (v.input_box.x + 15 + texto.get_width() + 5, v.input_box.y + 10))
+
+    pg.display.flip()
+
+    for event in eventos:
+        if event.type == pg.QUIT:
+            v.game = False
+        elif event.type == pg.KEYDOWN:
+            if event.key == pg.K_ESCAPE:
+                v.menu_mode = "main"
+                v.input_active = False
+            elif event.key == pg.K_RETURN and v.input_active:
+                if v.input_text.isdigit() and v.input_text != "":
+                    v.puntaje_maximo = int(v.input_text)
+                v.menu_mode = "main"
+                v.input_active = False
+            elif v.input_active:
+                if event.key == pg.K_BACKSPACE:
+                    v.input_text = v.input_text[:-1]
+                elif event.unicode.isdigit():
+                    v.input_text += event.unicode
+        elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
+            if v.input_box.collidepoint(event.pos):
+                v.input_active = True
+            else:
+                v.input_active = False
+
+
+def menuFinal(eventos):
+    v.pantalla.fill((20, 24, 40))
+
+    titulo = v.fuente.render("FIN DEL JUEGO", True, v.BLANCO)
+    mensaje = v.fuente.render(v.final_message, True, v.BLANCO)
+    v.pantalla.blit(titulo, titulo.get_rect(center=(400, 110)))
+    v.pantalla.blit(mensaje, mensaje.get_rect(center=(400, 180)))
+
+    boton_reiniciar = pg.Rect(80, 320, 300, 100)
+    boton_menu = pg.Rect(420, 320, 300, 100)
+
+    pg.draw.rect(v.pantalla, v.AZUL, boton_reiniciar, border_radius=24)
+    pg.draw.rect(v.pantalla, v.ROJO, boton_menu, border_radius=24)
+
+    texto_reiniciar = v.fuente.render("Volver a jugar", True, v.BLANCO)
+    texto_menu = v.fuente.render("Menú inicial", True, v.BLANCO)
+
+    v.pantalla.blit(texto_reiniciar, texto_reiniciar.get_rect(center=boton_reiniciar.center))
+    v.pantalla.blit(texto_menu, texto_menu.get_rect(center=boton_menu.center))
+
+    instruccion = v.fuente.render("Esc: Salir", True, v.BLANCO)
+    v.pantalla.blit(instruccion, instruccion.get_rect(center=(400, 520)))
+
+    pg.display.flip()
+
+    for event in eventos:
+        if event.type == pg.QUIT:
+            v.game = False
+        elif event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+            v.game = False
+        elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
+            if boton_reiniciar.collidepoint(event.pos):
+                v.puntaje_jugador1 = 0
+                v.puntaje_jugador2 = 0
+                v.Jugador1_texto = v.fuente.render("Jugador 1: 0", True, v.AZUL)
+                v.Jugador2_texto = v.fuente.render("Jugador 2: 0", True, v.ROJO)
+                v.pelota_rect.center = (400, 300)
+                v.velociad_pelota_x = 4
+                v.velociad_pelota_y = 4
+                v.in_game = True
+                v.menu_mode = "main"
+            elif boton_menu.collidepoint(event.pos):
+                v.puntaje_jugador1 = 0
+                v.puntaje_jugador2 = 0
+                v.Jugador1_texto = v.fuente.render("Jugador 1: 0", True, v.AZUL)
+                v.Jugador2_texto = v.fuente.render("Jugador 2: 0", True, v.ROJO)
+                v.pelota_rect.center = (400, 300)
+                v.velociad_pelota_x = 4
+                v.velociad_pelota_y = 4
+                v.menu_mode = "main"
+                v.in_game = False
 

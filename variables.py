@@ -14,7 +14,7 @@ pantalla = pg.display.set_mode((800,600))
 
 
 #Icono de la ventana
-icono = pg.image.load("pong.png")
+icono = pg.image.load("assets/pong.png")
 
 #Titulo de la ventana
 titulo = "PONG"
@@ -25,6 +25,7 @@ BLANCO = (255,255,255)
 FONDO = (150, 200, 170)
 AZUL = (70,130,180)
 ROJO = (200,70,90)
+NEGRO = (0,0,0)
 
 #Cordenadas y tamaños 
 jugador1_x = 50
@@ -59,10 +60,11 @@ pg.font.init()
 
 puntaje_jugador1 = 0
 puntaje_jugador2 = 0
-puntaje_maximo = 5  # Puntaje máximo para ganar el juego
+puntaje_maximo = 2  # Puntaje máximo para ganar el juego
 
 # Configurar la fuente
-fuente = pg.font.Font(None, 34)
+fuente = pg.font.Font(None, 48)
+fuente_pequena = pg.font.Font(None, 34)
 
 # Crear una superficie con el texto
 Jugador1_texto = fuente.render("Jugador 1: " + str(puntaje_jugador1), True, (AZUL))
@@ -82,5 +84,19 @@ sonido_golpe_pared.set_volume(0.5)
 sonido_punto.set_volume(0.3)
 
 
-in_game = True  # Variable para controlar si el juego está en curso o no
+in_game = False  # Variable para controlar si el juego está en curso o no (inicio en menú)
 
+
+#CPU Mode
+cpu_mode = False  # Si es True, el jugador 2 se mueve automáticamente
+cpu_vel = 3  # Velocidad de la CPU cuando sigue la pelota
+cpu_reaccion = 20  # Zona de tolerancia para que la CPU no reaccione instantáneamente
+cpu_error = 40  # Desviación aleatoria en el objetivo de la CPU
+cpu_target_offset = 0  # Offset actual que la CPU usa para añadir imprecisión
+
+# Menú y entrada de texto
+menu_mode = "main"  # "main" para menú inicial, "input" para la pantalla de texto, "end" para menú final
+input_box = pg.Rect(240, 420, 320, 60)
+input_text = str(puntaje_maximo)
+input_active = False
+final_message = ""  # Texto que mostrará el menú final
