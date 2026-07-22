@@ -39,6 +39,10 @@ while v.game:
         #Estado de las teclas
         teclas = pg.key.get_pressed()
 
+        if teclas[pg.K_ESCAPE]:
+            f.menuPausa()
+            pg.display.flip()
+
         #Comprobamos el estado de las teclas
         if teclas[pg.K_w]:
             if v.jugador1_rect.y > 0:  # Evitar que el jugador salga de la pantalla
