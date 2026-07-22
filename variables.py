@@ -1,5 +1,6 @@
 from tkinter import font
 import pygame as pg
+from pathlib import Path
 pg.init()  
 
 
@@ -14,7 +15,9 @@ pantalla = pg.display.set_mode((800,600))
 
 
 #Icono de la ventana
-icono = pg.image.load("assets/pong.png")
+
+BASE_DIR = Path(__file__).resolve().parent
+icono = pg.image.load(BASE_DIR / "assets" / "pong.png")
 
 #Titulo de la ventana
 titulo = "PONG"
@@ -100,3 +103,7 @@ input_box = pg.Rect(240, 420, 320, 60)
 input_text = str(puntaje_maximo)
 input_active = False
 final_message = ""  # Texto que mostrará el menú final
+
+
+#Menu pausa
+pausa = False
