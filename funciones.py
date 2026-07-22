@@ -141,7 +141,7 @@ def menuInicial(eventos):
     titulo = v.fuente.render("PONG", True, v.BLANCO)
     icono_escalado = pg.transform.scale(v.icono, (titulo.get_height(), titulo.get_height()))
     v.pantalla.blit(titulo, titulo.get_rect(center=(400, 120)))
-    v.pantalla.blit(icono_escalado, icono_escalado.get_rect(center=(450, 120)))
+    v.pantalla.blit(icono_escalado, icono_escalado.get_rect(center=(470, 120)))
 
     local = pg.Rect(120, 250, 260, 90)
     cpu = pg.Rect(420, 250, 260, 90)
@@ -253,23 +253,72 @@ def menuFinal(eventos):
             v.game = False
         elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
             if boton_reiniciar.collidepoint(event.pos):
-                v.puntaje_jugador1 = 0
-                v.puntaje_jugador2 = 0
-                v.Jugador1_texto = v.fuente.render("Jugador 1: 0", True, v.AZUL)
-                v.Jugador2_texto = v.fuente.render("Jugador 2: 0", True, v.ROJO)
-                v.pelota_rect.center = (400, 300)
-                v.velociad_pelota_x = 4
-                v.velociad_pelota_y = 4
+                resetMenus()
                 v.in_game = True
                 v.menu_mode = "main"
             elif boton_menu.collidepoint(event.pos):
-                v.puntaje_jugador1 = 0
-                v.puntaje_jugador2 = 0
-                v.Jugador1_texto = v.fuente.render("Jugador 1: 0", True, v.AZUL)
-                v.Jugador2_texto = v.fuente.render("Jugador 2: 0", True, v.ROJO)
-                v.pelota_rect.center = (400, 300)
-                v.velociad_pelota_x = 4
-                v.velociad_pelota_y = 4
+                resetMenus()
                 v.menu_mode = "main"
                 v.in_game = False
 
+def menuPausa():
+    v.pausa = True
+    while v.pausa:
+
+        #Manejamos los eventos de la ventana
+        eventos = pg.event.get()
+        for event in eventos:
+            #Si el evento es de tipo QUIT, cerramos el bucle
+            if event.type == pg.QUIT:
+                v.game = False
+                v.pausa = False
+
+        v.pantalla.fill(v.NEGRO)  # Limpiamos
+        titulo = v.fuente.render("PAUSA", True, v.BLANCO)
+        v.pantalla.blit(titulo, titulo.get_rect(center=(400, 120)))
+
+        continuar = pg.Rect(120, 250, 260, 90)
+        reiniciar = pg.Rect(420, 250, 260, 90)
+        menu = pg.Rect(230, 370, 340, 90)
+
+        pg.draw.rect(v.pantalla, v.AZUL, continuar, border_radius=20)
+        pg.draw.rect(v.pantalla, v.ROJO, reiniciar, border_radius=20)
+        pg.draw.rect(v.pantalla, v.BLANCO, menu, 3, border_radius=20)
+
+        texto_continuar = v.fuente.render("CONTINUAR", True, v.BLANCO)
+        texto_reiniciar = v.fuente.render("REINICIAR", True, v.BLANCO)
+        texto_menu = v.fuente.render("Volver al menu", True, v.BLANCO)
+
+        v.pantalla.blit(texto_continuar, texto_continuar.get_rect(center=continuar.center))
+        v.pantalla.blit(texto_reiniciar, texto_reiniciar.get_rect(center=reiniciar.center))
+        v.pantalla.blit(texto_menu, texto_menu.get_rect(center=menu.center))
+
+        instruccion = v.fuente.render("Esc: Salir", True, v.BLANCO)
+        v.pantalla.blit(instruccion, instruccion.get_rect(center=(400, 520)))
+
+        pg.display.flip()
+        
+
+        for event in eventos:
+            if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+                v.game = False
+                v.pausa = False
+            elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
+                if continuar.collidepoint(event.pos):
+                    v.pausa = False
+                elif reiniciar.collidepoint(event.pos):
+                    resetMenus()
+                    v.pausa = False
+                elif menu.collidepoint(event.pos):
+                    resetMenus()
+                    v.in_game = False
+                    v.menu_mode = "main"
+                    v.pausa = False
+def resetMenus():
+    v.puntaje_jugador1 = 0
+    v.puntaje_jugador2 = 0
+    v.Jugador1_texto = v.fuente.render("Jugador 1: 0", True, v.AZUL)
+    v.Jugador2_texto = v.fuente.render("Jugador 2: 0", True, v.ROJO)
+    v.pelota_rect.center = (400, 300)
+    v.velociad_pelota_x = 4
+    v.velociad_pelota_y = 4
