@@ -4,6 +4,11 @@ import random
 import pygame as pg
 import variables as v
 
+# Una Surface es un objeto gráfico de Pygame que representa una imagen o área de dibujo. 
+# La pantalla, las imágenes cargadas y los textos renderizados son todos Surface. 
+# Luego usas blit() para copiar una Surface sobre otra.
+
+
 #Creamos una funcion para dibujar los elementos del juego
 def dibujar():
     #Dibujamos el fondo de la pantalla
@@ -187,7 +192,8 @@ def menuSeleccion(eventos):
     v.pantalla.fill(v.NEGRO)
 
     titulo = v.fuente.render("Puntaje máximo", True, v.BLANCO)
-    v.pantalla.blit(titulo, titulo.get_rect(center=(400, 120)))
+    v.pantalla.blit(titulo, titulo.get_rect(center=(400, 120))) # Pegamos a la pantalla el titulo, como hacemos get_rect nos algo asi: <rect(0, 0, 220, 45)>, al escribri center lo centra directamente desde el centro
+    # y no des de la esquina superior izquierda, pasa a ser: <rect(290, 98, 220, 45)> para que quede en ese centro.
 
     pg.draw.rect(v.pantalla, v.BLANCO, v.input_box, 3, border_radius=12)
     texto = v.fuente_pequena.render(v.input_text, True, v.BLANCO)
@@ -205,25 +211,25 @@ def menuSeleccion(eventos):
     for event in eventos:
         if event.type == pg.QUIT:
             v.game = False
-        elif event.type == pg.KEYDOWN:
-            if event.key == pg.K_ESCAPE:
+        elif event.type == pg.KEYDOWN: # Si pulsa una tecla de teclado
+            if event.key == pg.K_ESCAPE: # Miramos si es escape
                 v.menu_mode = "main"
                 v.input_active = False
-            elif event.key == pg.K_RETURN and v.input_active:
-                if v.input_text.isdigit() and v.input_text != "":
-                    v.puntaje_maximo = int(v.input_text)
+            elif event.key == pg.K_RETURN and v.input_active: # Si la key es Enter y input esta activo
+                if v.input_text.isdigit() and v.input_text != "": # Si el input text es un digito y es diferente a vacio
+                    v.puntaje_maximo = int(v.input_text) # Cambiamos el puntaje por lo que ponga en input 
                 v.menu_mode = "main"
-                v.input_active = False
-            elif v.input_active:
-                if event.key == pg.K_BACKSPACE:
-                    v.input_text = v.input_text[:-1]
-                elif event.unicode.isdigit():
-                    v.input_text += event.unicode
-        elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
-            if v.input_box.collidepoint(event.pos):
-                v.input_active = True
+                v.input_active = False # Y cambiamos el input active a false
+            elif v.input_active: # Si no le ha dado el enter pero input esta activo
+                if event.key == pg.K_BACKSPACE: # Si presiona la tecla de borrar
+                    v.input_text = v.input_text[:-1] # Le borramos el ultimo digito a input text
+                elif event.unicode.isdigit(): # Si unicode que es lo que se escribe, es decir ahi se guarda la tecla que pulsas, si es digito
+                    v.input_text += event.unicode # A input le sumamos la tecla
+        elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1: # Si lo que habia pulsado no era una tecla y era con el raton, clic izquierdo porque hemos puesto 1
+            if v.input_box.collidepoint(event.pos): # Si esta en el rango del boton
+                v.input_active = True # Estamos en el input
             else:
-                v.input_active = False
+                v.input_active = False # Si no, no
 
 
 def menuFinal(eventos):
@@ -266,7 +272,7 @@ def menuFinal(eventos):
                 v.menu_mode = "main"
                 v.in_game = False
 
-def menuPausa():
+def menuPausa(): # Cada vez que ejecutemos esta funcion pausa es true y se inciia un bucle diferente al del main
     v.pausa = True
     while v.pausa:
 
