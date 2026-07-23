@@ -35,11 +35,11 @@ while v.game:
         if event.type == pg.QUIT:
             v.game = False
 
-    if v.in_game:
+    if v.in_game: # Comprobamos si estamos en el juego
         #Estado de las teclas
         teclas = pg.key.get_pressed()
 
-        if teclas[pg.K_ESCAPE]:
+        if teclas[pg.K_ESCAPE]: # Comprobamos si la tecla es escape para inciar el menu pausa
             f.menuPausa()
             pg.display.flip()
 
@@ -92,7 +92,7 @@ while v.game:
         pg.display.flip()
 
         v.reloj.tick(60)  # Limitamos a 60 FPS
-    else:
+    else: # Si no estamos en el juego, significa que hay que mostrar otra pantalla, segun el menu_mode
         if v.menu_mode == "main":
             f.menuInicial(eventos)
         elif v.menu_mode == "input":
