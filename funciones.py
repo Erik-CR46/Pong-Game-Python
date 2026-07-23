@@ -117,7 +117,7 @@ def fuera_juego():
         v.sonido_punto.play()  # Reproducimos el sonido del punto
 
 
-def reset_all(jugador):
+def reset_all(jugador): # Funcion para resetear la posicion y determinar el mensaje final
     v.pelota_rect.x = 400  # Reiniciamos la posición de la pelota
     v.pelota_rect.y = 300
     v.jugador1_rect.y = 250
@@ -127,54 +127,59 @@ def reset_all(jugador):
     v.final_message = jugador
 
 
-def ganador():
+def ganador(): # Funcion para ver quien ha ganado el juegp
     #Comprobamos si alguno de los jugadores ha alcanzado el puntaje máximo
     if v.puntaje_jugador1 >= v.puntaje_maximo:
-        reset_all("¡Jugador 1 gana!")
+        reset_all("¡Jugador 1 gana!") #Llamamos a la funcion anterior con el texto indicado
 
     elif v.puntaje_jugador2 >= v.puntaje_maximo:
         reset_all("¡Jugador 2 gana!")
 
-def menuInicial(eventos):
+def menuInicial(eventos): # Funcion para generar el menu inicial
     v.pantalla.fill(v.NEGRO)  # Limpiamos
 
-    titulo = v.fuente.render("PONG", True, v.BLANCO)
-    icono_escalado = pg.transform.scale(v.icono, (titulo.get_height(), titulo.get_height()))
-    v.pantalla.blit(titulo, titulo.get_rect(center=(400, 120)))
+    titulo = v.fuente.render("PONG", True, v.BLANCO) # Titulo
+    icono_escalado = pg.transform.scale(v.icono, (titulo.get_height(), titulo.get_height())) # Escalamos la imagen 
+    v.pantalla.blit(titulo, titulo.get_rect(center=(400, 120))) # Lo pintamos en una posicion indicada
     v.pantalla.blit(icono_escalado, icono_escalado.get_rect(center=(470, 120)))
 
+    # Creamos rects con medidas, height y witdh mas la posicion
     local = pg.Rect(120, 250, 260, 90)
     cpu = pg.Rect(420, 250, 260, 90)
     config = pg.Rect(280, 370, 240, 70)
 
+    # Lo pintamos en pantalla dando border_radius
     pg.draw.rect(v.pantalla, v.AZUL, local, border_radius=20)
     pg.draw.rect(v.pantalla, v.ROJO, cpu, border_radius=20)
-    pg.draw.rect(v.pantalla, v.BLANCO, config, 3, border_radius=20)
+    pg.draw.rect(v.pantalla, v.BLANCO, config, 3, border_radius=20) # El 3 es el grosor del borde
 
+    # Creamos los textos de los rects 
     texto_local = v.fuente.render("2 Jugadores", True, v.BLANCO)
     texto_cpu = v.fuente.render("CPU", True, v.BLANCO)
     texto_config = v.fuente.render("Puntaje", True, v.BLANCO)
 
+    # Pintamos como antes pero en el center del rect creado anteriormente
     v.pantalla.blit(texto_local, texto_local.get_rect(center=local.center))
     v.pantalla.blit(texto_cpu, texto_cpu.get_rect(center=cpu.center))
     v.pantalla.blit(texto_config, texto_config.get_rect(center=config.center))
-
+    
     instruccion = v.fuente.render("Esc: Salir", True, v.BLANCO)
     v.pantalla.blit(instruccion, instruccion.get_rect(center=(400, 520)))
 
-    pg.display.flip()
+    pg.display.flip() # Actualizamos pantalla
 
+    # Recorremos eventos
     for event in eventos:
-        if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
-            v.game = False
-        elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
-            if local.collidepoint(event.pos):
-                v.cpu_mode = False
-                v.in_game = True
-            elif cpu.collidepoint(event.pos):
+        if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE: # Si es un evento de teclado y la tecla pulsada es escape
+            v.game = False # El bucle de main termina
+        elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1: # Si presiona un boton del raton y es el 1, es decir el izquierdo
+            if local.collidepoint(event.pos): # Comprobamos si esta dentro de local (El boton creado antes)
+                v.cpu_mode = False # Desactivamos la CPU
+                v.in_game = True # Empezamos el juego
+            elif cpu.collidepoint(event.pos): # Lo mismo pero con el boton CPU
                 v.cpu_mode = True
                 v.in_game = True
-            elif config.collidepoint(event.pos):
+            elif config.collidepoint(event.pos): # Si el clic esta dentro de config, el menu_mode cambia a input
                 v.menu_mode = "input"
 
 
